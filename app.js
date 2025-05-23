@@ -12,6 +12,9 @@ app.use(cors());
 const authRoutes = require('./auth');
 app.use('/', authRoutes);
 
+const adminEntryRoutes = require('./adminEntry');
+app.use('/', adminEntryRoutes);
+
 app.get('/', (req, res) => {
     res.send('MovieMatrix Server is running');
 });
