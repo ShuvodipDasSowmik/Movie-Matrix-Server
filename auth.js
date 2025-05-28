@@ -15,16 +15,17 @@ const createUser = async (fullName, userName, email, password, DOB, role, res) =
     // Hash the password with the salt
     const hashed = bcrypt.hashSync(password, salt);
 
-    const q = 'INSERT INTO SYSTEM_USERS (`FULLNAME`, `USERNAME`, `EMAIL`, `PASSWORD`, `ROLE`) VALUES (?)';
-    const values = [fullName, userName, email, hashed, role];
-
+    // PostgreSQL uses $1, $2, etc. for parameter placeholders
+    const q = 'INSERT INTO systemuser (FULLNAME, USERNAME, EMAIL, PASSWORD, ROLE, DATEOFBIRTH) VALUES ($1, $2, $3, $4, $5, $6)';
+    const values = [fullName, userName, email, hashed, role, DOB];
 
     console.log('Inserting user into database:', DOB);
 
-    const q2 = 'INSERT INTO USERS (`USERNAME`, `DOB`) VALUES (?, ?)';
+    const q2 = 'INSERT INTO USERS (USERNAME) VALUES ($1)';
 
-    const [result] = await db.query(q, [values]);
-    const [result2] = await db.query(q2, [userName, DOB]);
+    // Execute the queries and handle the results
+    const result = await db.query(q, values);
+    const result2 = await db.query(q2, [userName]);
 
     console.log('User created successfully:', result && result2);
 
@@ -36,12 +37,8 @@ const createUser = async (fullName, userName, email, password, DOB, role, res) =
   }
 }
 
-
-// db.query(query, values)
-// sqlQuery: SQL query string with placeholders (e.g., '?')
-// values: Array of values to replace the placeholders in the SQL query
-// callback: Function to handle the result of the query (error, data)
-// Example: db.query('SELECT * FROM users WHERE id = ?', [userId], (err, data) => { ... })
+// PostgreSQL uses $1, $2, etc. for parameter placeholders instead of ?
+// Example: db.query('SELECT * FROM users WHERE id = $1', [userId])
 
 router.post('/signup', async (req, res) => {
   try {
@@ -50,9 +47,10 @@ router.post('/signup', async (req, res) => {
     console.log('Received signup request:', req.body);
 
     // Check if the user already exists
-    const existQuery = 'SELECT * FROM SYSTEM_USERS WHERE username = ? OR email = ?';
+    const existQuery = 'SELECT * FROM systemuser WHERE username = $1 OR email = $2';
 
-    const [rows] = await db.query(existQuery, [userName, email]);
+    const result = await db.query(existQuery, [userName, email]);
+    const rows = result.rows; // PostgreSQL returns result.rows instead of [rows]
     console.log('Checking user existence:', { userName, email, found: rows.length > 0 });
 
     if (rows.length) {
@@ -70,8 +68,6 @@ router.post('/signup', async (req, res) => {
   }
 });
 
-
-
 // User Authentication Route
 
 router.post('/signin', async (req, res) => {
@@ -79,20 +75,21 @@ router.post('/signin', async (req, res) => {
     const { userName, password } = req.body;
     console.log('Received signin request:', req.body);
 
-    const q = 'SELECT * FROM SYSTEM_USERS WHERE username = ?';
+    const q = 'SELECT * FROM systemuser WHERE username = $1';
 
-    const [rows] = await db.query(q, [userName]);
+    const result = await db.query(q, [userName]);
+    const rows = result.rows;
 
     if (rows.length === 0) return res.status(404).json('User not found');
 
-    
-    const isPasswordCorrect = bcrypt.compareSync(password, rows[0].PASSWORD);
+    // PostgreSQL column names might be case-sensitive or lowercase by default
+    const isPasswordCorrect = bcrypt.compareSync(password, rows[0].password || rows[0].PASSWORD);
     if (!isPasswordCorrect) return res.status(400).json('Wrong credentials');
 
     // Generate a JWT token
     const token = jwt.sign({ id: rows[0].id }, process.env.TOKEN_SECRET);
 
-    res.json({ token, user: { username: rows[0].USERNAME } });
+    res.json({ token, user: { username: rows[0].username || rows[0].USERNAME } });
     console.log('Signin successful:', { userName });
 
   } catch (error) {
@@ -118,4 +115,8 @@ const verifyToken = (req, res, next) => {
 
 }
 
+// At the end of the file, change the export to:
 module.exports = router;
+
+// Export verifyToken separately
+module.exports.verifyToken = verifyToken;
