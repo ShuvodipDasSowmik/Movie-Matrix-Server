@@ -122,6 +122,9 @@ router.post('/admin', async (req, res) => {
 
         else if (reqData.dataType === 'actor') {
 
+            // Constraint in Actor Table: unique_director_fields (actorname, nationality, dob)
+            // All rows must have unique combination of these fields
+
             try {
                 const actorQuery = `INSERT INTO ACTOR (actorname, biography, nationality, dob) VALUES ($1, $2, $3, $4)`;
                 const actorData = reqData.data;
@@ -180,6 +183,10 @@ router.post('/admin', async (req, res) => {
         }
 
         else if (reqData.dataType === 'director') {
+
+            // Constraint in Director Table: unique_director_fields (directorname, nationality, dob)
+            // All rows must have unique combination of these fields
+
             try {
                 const directorQuery = `INSERT INTO DIRECTOR (directorname, biography, nationality, dob) VALUES ($1, $2, $3, $4)`;
                 const directorData = reqData.data;
@@ -216,6 +223,7 @@ router.post('/admin', async (req, res) => {
                         success: results.filter(result => result.success),
                         failures: failures
                     })
+
                 }
 
                 console.log('Data Insertion Successful');
@@ -235,6 +243,81 @@ router.post('/admin', async (req, res) => {
                 })
             }
         }
+
+        else if (reqData.dataType === 'media') {
+
+            try {
+                const mediaData = reqData.data;
+                const mediaQuery = `INSERT INTO MEDIA (title, releaseyear, description, language, pgrating, trailerlink, mediatype)
+                                    VALUES ($1, $2, $3, $4, $5, $6, $7)
+                                    RETURNING mediaid`;
+
+                // Constraint in Media Table: unique_media_fields (title, releaseyear, language, pgrating, mediatype)
+                // All rows must have unique combination of these fields
+
+                const results = await Promise.all(
+                    mediaData.map(async (value) => {
+                        try {
+                            const result = await db.query(mediaQuery, [
+                                value.title,
+                                value.releaseyear,
+                                value.description,
+                                value.language,
+                                value.pgrating,
+                                value.trailerlink,
+                                value.mediatype
+                            ]);
+
+                            const mediaid = result.rows[0].mediaid;
+
+                            if (value.mediatype.toLowerCase() === 'movie') {
+
+                                const mediaTypeQuery = `INSERT INTO MOVIE (mediaid, duration) VALUES ($1, $2)`;
+                                await db.query(mediaTypeQuery, [mediaid, value.duration]);
+
+                            }
+
+                            else if (value.mediatype.toLowerCase() === 'series') {
+
+                                const mediaTypeQuery = `INSERT INTO TVSERIES (mediaid, isongoing) VALUES ($1, $2)`;
+                                await db.query(mediaTypeQuery, [mediaid, value.isongoing]);
+
+                            }
+
+                            console.log(`Query Successful for ${value.title}`);
+                            return { success: true, result: value.title };
+
+                        } catch (err) {
+                            console.error(`Failed to insert ${value.title}:`, err.message);
+                            return { success: false, result: err.message };
+                        }
+                    })
+                );
+
+                const failures = results.filter(result => !result.success);
+
+                if (failures.length > 0) {
+                    return res.status(207).json({
+                        message: 'Some Media could not be inserted',
+                        success: results.filter(r => r.success),
+                        failures
+                    });
+                }
+
+                return res.status(200).json({
+                    message: 'All media inserted successfully',
+                    results
+                });
+
+            } catch (promiseError) {
+                console.error('Error Processing Media Queries', promiseError);
+                return res.status(500).json({
+                    message: 'Failed to process Media Data Insertion',
+                    error: promiseError.message
+                });
+            }
+        }
+
     }
     catch (error) {
         console.error('Error processing admin entry:', error);
