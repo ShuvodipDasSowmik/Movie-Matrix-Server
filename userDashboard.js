@@ -1,8 +1,7 @@
 const express = require('express');
-const jwt = require('jsonwebtoken');
 const db = require('./database');
 const auth = require('./auth');
-const verifyToken = auth.verifyToken; // Import verifyToken from auth module
+const verifyToken = auth.verifyToken;
 const router = express.Router();
 
 // Route to validate token and get user info

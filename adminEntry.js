@@ -318,6 +318,66 @@ router.post('/admin', async (req, res) => {
             }
         }
 
+        else if (reqData.dataType === 'mediaactor') {
+
+            const mediaActorData = reqData.data;
+
+            // SUB QUERIES
+            const mediaActorQuery = `INSERT INTO MEDIAACTOR (mediaid, actorid) VALUES ((SELECT mediaid FROM MEDIA WHERE title = $1), (SELECT actorid FROM ACTOR WHERE actorname = $2))`;
+
+            try {
+                const results = await Promise.all(
+                    mediaActorData.map(async (value) => {
+
+                        try {
+                            const result = await db.query(mediaActorQuery, [value.Media, value.Actor]);
+                            console.log(`Query Successful for ${value.Media} and ${value.Actor}`);
+
+                            return {
+                                success: true,
+                                result: result
+                            }
+                        } catch (queryError) {
+                            console.log(`Query Failed for ${value.Media} and ${value.Actor}: ${queryError.message}`);
+
+                            return {
+                                success: false,
+                                result: queryError.message
+                            }
+                        }
+
+                    })
+                );
+
+                const failures = results.filter(result => !result.success);
+
+                if (failures.length > 0) {
+
+                    return res.status(207).json({
+                        message: 'Some Movie Actor Mapping Data could not be inserted',
+                        success: results.filter(result => result.success),
+                        failures: failures
+                    })
+
+                }
+
+                console.log('Data Insertion Successful');
+
+                return res.status(200).json({
+                    message: 'Success',
+                    results
+                })
+            } catch (promiseError) {
+                console.log('Error Processing Media Actor Mapping Queries');
+
+                return res.status(500).json({
+                    message: 'Failed to process Director insertions',
+                    error: promiseError.message
+                })
+            }
+
+        }
+
     }
     catch (error) {
         console.error('Error processing admin entry:', error);

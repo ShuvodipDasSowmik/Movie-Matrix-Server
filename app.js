@@ -18,6 +18,9 @@ app.use('/', adminEntryRoutes);
 const userDashboardRoutes = require('./userDashboard');
 app.use('/', userDashboardRoutes);
 
+const actor = require('./actorDashboard');
+app.use('/', actor)
+
 app.get('/', (req, res) => {
     res.send('MovieMatrix Server is running');
 });
