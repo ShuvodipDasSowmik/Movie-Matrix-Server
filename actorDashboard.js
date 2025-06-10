@@ -8,6 +8,8 @@ router.get('/actors/:actorname', async (req, res) => {
     console.log(actorname);
     
     const actorQuery = `SELECT * FROM ACTOR WHERE actorname = $1`;
+
+    // Use of Advance SQL [JOIN Statements and Sub Queries]
     const actorMediasQuery = `Select ME.mediaid, title, releaseyear, poster FROM MEDIA ME JOIN MEDIAACTOR MA ON (ME.mediaid = MA.mediaid) WHERE actorid = (SELECT actorid FROM ACTOR WHERE actorname = $1)`
 
     try{

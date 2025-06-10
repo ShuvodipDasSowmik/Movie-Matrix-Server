@@ -345,7 +345,6 @@ router.post('/admin', async (req, res) => {
                                 result: queryError.message
                             }
                         }
-
                     })
                 );
 
@@ -358,7 +357,6 @@ router.post('/admin', async (req, res) => {
                         success: results.filter(result => result.success),
                         failures: failures
                     })
-
                 }
 
                 console.log('Data Insertion Successful');
@@ -371,13 +369,123 @@ router.post('/admin', async (req, res) => {
                 console.log('Error Processing Media Actor Mapping Queries');
 
                 return res.status(500).json({
-                    message: 'Failed to process Director insertions',
+                    message: 'Failed to process Media Actor Data Insertions',
                     error: promiseError.message
                 })
             }
-
         }
 
+        else if(reqData.dataType === 'mediadirector'){
+            const mediaDirectorData = reqData.data;
+
+            // Sub QUERIES
+            const mediaDirectorQuery = `INSERT INTO MEDIADIRECTOR (mediaid, directorid) VALUES ((SELECT mediaid FROM MEDIA WHERE title = $1), (SELECT directorid FROM DIRECTOR WHERE directorname = $2))`;
+
+            try {               
+                const results = await Promise.all(
+                    mediaDirectorData.map(async(value) => {
+                        try {
+                            const result = await db.query(mediaDirectorQuery, [value.media, value.director]);
+
+                            console.log(`Query Successful for ${value.media} and ${value.director}`);
+
+                            return{
+                                success: true,
+                                result: result
+                            }
+                        } catch (queryError) {
+                            console.log(`Query Failed for ${value.media} and ${value.director}`);
+
+                            return{
+                                success: false,
+                                result: queryError.message
+                            }
+                        }
+                    })
+                )
+
+                const failures = results.filter(result => !result.success);
+
+                if(failures.length > 0){
+                    return res.status(207).json({
+                        message: 'Some Media Director Mapping Data Insertion Not Successful',
+                        success: results.filter(result => result.success),
+                        failures: failures
+                    })
+                }
+
+                console.log('Data Insertion Successful');
+                
+                return res.status(200).json({
+                    message: 'Success',
+                    results
+                })
+
+            } catch (promiseError) {
+                console.log('Error Processing Media Director Queries');
+
+                res.status(500).json({
+                    message: 'Failed to process Media Director Data Insertion',
+                    error: promiseError.message
+                })
+            }
+        }
+
+        else if(reqData.dataType === 'mediastudio'){
+            const mediaStudioData = reqData.data;
+
+            const mediaStudioQuery = `INSERT INTO MEDIASTUDIO (mediaid, studioid) VALUES ((SELECT mediaid FROM MEDIA WHERE title = $1), (SELECT studioid FROM STUDIO WHERE studioname = $2))`;
+
+            try {
+                const results = await Promise.all(
+                    mediaStudioData.map(async(value) => {
+                        try {
+                            const result = await db.query(mediaStudioQuery, [value.Media, value.Studio]);
+
+                            console.log(`Query Successful for ${value.Media} and ${value.Studio}`);
+                            
+                            return{
+                                success: true,
+                                result: result
+                            }
+
+                        } catch (queryError) {
+                            console.log(`Query Failed for ${value.Media} and ${value.Studio}`);
+
+                            return{
+                                success: false,
+                                result: queryError.message
+                            }                            
+                        }
+                    })
+                )
+
+                const failures = results.filter(result => !result.success);
+
+                if(failures.length > 0){
+                    return res.status(207).json({
+                        message: 'Some Media Studio Mapping Data Insertion Not Successful',
+                        success: results.filter(result => result.success),
+                        failures: failures
+                    })
+                }
+
+                console.log('Data Insertion Successful');
+
+                return res.status(200).json({
+                    message: 'Success',
+                    results
+                })
+                
+            } catch (promiseError) {
+                console.log('Error Processing Media Studio Data');
+
+                return res.status(500).json({
+                    message: 'Failed to process Media Studio Mapping Data Insertion',
+                    error: promiseError.message
+                })
+            }
+        }
     }
     catch (error) {
         console.error('Error processing admin entry:', error);

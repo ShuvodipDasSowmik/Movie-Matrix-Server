@@ -86,10 +86,21 @@ router.post('/signin', async (req, res) => {
     const isPasswordCorrect = bcrypt.compareSync(password, rows[0].password || rows[0].PASSWORD);
     if (!isPasswordCorrect) return res.status(400).json('Wrong credentials');
 
-    // Generate a JWT token
-    const token = jwt.sign({ id: rows[0].id }, process.env.TOKEN_SECRET);
+    // Generate a JWT token with more user information
+    const token = jwt.sign({ 
+      id: rows[0].id,
+      username: rows[0].username || rows[0].USERNAME,
+      role: rows[0].role || rows[0].ROLE
+    }, process.env.TOKEN_SECRET, { expiresIn: '1h' });
 
-    res.json({ token, user: { username: rows[0].username || rows[0].USERNAME } });
+    res.json({ 
+      token, 
+      user: { 
+        username: rows[0].username || rows[0].USERNAME,
+        fullName: rows[0].fullname || rows[0].FULLNAME,
+        role: rows[0].role || rows[0].ROLE
+      } 
+    });
     console.log('Signin successful:', { userName });
 
   } catch (error) {
@@ -116,7 +127,8 @@ const verifyToken = (req, res, next) => {
 }
 
 // At the end of the file, change the export to:
-module.exports = router;
+const authRouter = router;
+module.exports = authRouter;
 
 // Export verifyToken separately
 module.exports.verifyToken = verifyToken;

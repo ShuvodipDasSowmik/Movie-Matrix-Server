@@ -7,10 +7,27 @@ const router = express.Router();
 // Route to validate token and get user info
 router.get('/validate-token', verifyToken, async (req, res) => {
   try {
-    const requsest = req.headers;
-    console.log(requsest);
+    // Get username from the decoded token
+    const tokenUsername = req.user.username;
+    // Get requested username from query params
+    const requestedUsername = req.query.requestedUsername;
     
-    const username = req.headers.username;
+    // If a specific profile is requested, check authorization
+    if (requestedUsername && tokenUsername !== requestedUsername) {
+      // Check if user has permissions to view the requested profile
+      // For example, admin users might be allowed to view any profile
+      const isAdmin = req.user.role === 'ADMIN';
+      
+      if (!isAdmin) {
+        return res.status(403).json({ 
+          message: 'You do not have permission to view this profile',
+          authorizedUsername: tokenUsername 
+        });
+      }
+    }
+    
+    // Use the requested username if provided and authorized, otherwise use the token username
+    const username = requestedUsername || tokenUsername;
     
     // Fetch user information from database
     const query = 'SELECT username, fullname, email, dateofbirth, role FROM systemuser WHERE username = $1';
@@ -21,9 +38,7 @@ router.get('/validate-token', verifyToken, async (req, res) => {
     }
     
     const user = result.rows[0];
-
     console.log('User information:', user);
-    
     
     // Return user information (excluding sensitive data like password)
     return res.status(200).json({
@@ -57,6 +72,33 @@ router.get('/dashboard', verifyToken, async (req, res) => {
     });
   } catch (error) {
     console.error('Error fetching dashboard data:', error);
+    return res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
+// Route to update user information
+router.put('/update-user', verifyToken, async (req, res) => {
+  try {
+    const username = req.user.username;
+    const { fullName } = req.body;
+    
+    // Update user information
+    const query = 'UPDATE systemuser SET fullname = $1 WHERE username = $2 RETURNING *';
+    const result = await db.query(query, [fullName, username]);
+    
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    
+    return res.status(200).json({ 
+      message: 'User updated successfully', 
+      user: {
+        username: result.rows[0].username,
+        fullName: result.rows[0].fullname
+      }
+    });
+  } catch (error) {
+    console.error('Error updating user:', error);
     return res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
