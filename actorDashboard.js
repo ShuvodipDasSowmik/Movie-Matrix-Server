@@ -46,4 +46,29 @@ router.get('/actors/:actorname', async (req, res) => {
 })
 
 
+router.get('/actors', async(req, res) => {
+    const actorsQuery = `SELECT actorid, actorname, picture, nationality FROM ACTOR`;
+    
+    try{
+        const actorsResult = await db.query(actorsQuery);
+        const actorsData = actorsResult.rows;
+
+        console.log(actorsData);
+
+        res.status(200).json({
+            message: 'Success',
+            actorsData
+        });
+
+    }catch(queryError){
+        console.log('Actors Data failed to fetch from Database');
+        
+        res.status(404).json({
+            message: queryError.message
+        })
+    }
+
+})
+
+
 module.exports = router;
