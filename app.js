@@ -19,7 +19,10 @@ const userDashboardRoutes = require('./userDashboard');
 app.use('/', userDashboardRoutes);
 
 const actor = require('./actorDashboard');
-app.use('/', actor)
+app.use('/', actor);
+
+const media = require('./mediaDashboard');
+app.use('/', media);
 
 app.get('/', (req, res) => {
     res.send('MovieMatrix Server is running');

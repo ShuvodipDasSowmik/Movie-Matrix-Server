@@ -2,23 +2,23 @@ const express = require('express');
 const db = require('./database');
 const router = express.Router();
 
-router.get('/actors/:actorname', async (req, res) => {
+router.get('/actors/:actorid', async (req, res) => {
 
-    const actorname = req.params.actorname;
-    console.log(actorname);
+    const actorid = req.params.actorid;
+    console.log(actorid);
     
-    const actorQuery = `SELECT * FROM ACTOR WHERE actorname = $1`;
+    const actorQuery = `SELECT * FROM ACTOR WHERE actorid = $1`;
 
     // Use of Advance SQL [JOIN Statements and Sub Queries]
-    const actorMediasQuery = `Select ME.mediaid, title, releaseyear, poster FROM MEDIA ME JOIN MEDIAACTOR MA ON (ME.mediaid = MA.mediaid) WHERE actorid = (SELECT actorid FROM ACTOR WHERE actorname = $1)`
+    const actorMediasQuery = `Select ME.mediaid, title, releaseyear, poster FROM MEDIA ME JOIN MEDIAACTOR MA ON (ME.mediaid = MA.mediaid) WHERE actorid = $1`
 
     try{
 
-        const actorResult = await db.query(actorQuery, [actorname]);
-        console.log(`ActorData Query Successful for ${actorname}`);
+        const actorResult = await db.query(actorQuery, [actorid]);
+        console.log(`ActorData Query Successful for ${actorResult.actorname}`);
 
-        const actorMediaResult = await db.query(actorMediasQuery, [actorname]);
-        console.log(`ActorMedia Query Successful for ${actorname}`);
+        const actorMediaResult = await db.query(actorMediasQuery, [actorid]);
+        console.log(`ActorMedia Query Successful for ${actorResult.actorname}`);
         
         const actorData = actorResult.rows[0];
 
@@ -36,7 +36,7 @@ router.get('/actors/:actorname', async (req, res) => {
 
     }catch(queryError){
 
-        console.log(`Query Failed for ${actorname}: ${queryError.message}`);
+        console.log(`Query Failed for ${actorid}: ${queryError.message}`);
         
         res.status(404).json({
             message: queryError.message
