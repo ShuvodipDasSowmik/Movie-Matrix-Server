@@ -486,6 +486,64 @@ router.post('/admin', async (req, res) => {
                 })
             }
         }
+
+        else if(reqData.dataType === 'mediagenre'){
+            const mediaGenreData = reqData.data;
+
+            const mediaGenreQuery = `INSERT INTO MEDIAGENRE (mediaid, genreid) VALUES ((SELECT mediaid FROM MEDIA WHERE title = $1),(SELECT genreid FROM GENRE WHERE genrename = $2))`;
+
+            try {
+                const results = await Promise.all(
+                    mediaGenreData.map(async(value) => {
+                        try {
+                            const result = await db.query(mediaGenreQuery, [value.media, value.genre]);
+
+                            console.log(`Query Successful for ${value.media} and ${value.genre}`);
+                            
+                            return{
+                                success: true,
+                                result: result
+                            }
+
+                        } catch (queryError) {
+                            console.log(`Query Failed for ${value.media} and ${value.genre}`);
+
+                            return{
+                                success: false,
+                                result: queryError.message
+                            } 
+                        }
+
+                        
+                    })
+                )
+
+                const failures = results.filter(result => !result.success);
+
+                if(failures.length > 0){
+                    return res.status(207).json({
+                        message: 'Some Media Genre Mapping Data Insertion Not Successful',
+                        success: results.filter(result => result.success),
+                        failures: failures
+                    })
+                }
+
+                console.log('Data Insertion Successful');
+
+                return res.status(200).json({
+                    message: 'Success',
+                    results
+                })
+
+            } catch (promiseError) {
+                console.log('Error Processing Media Genre Data');
+
+                return res.status(500).json({
+                    message: 'Failed to process Media Genre Mapping Data Insertion',
+                    error: promiseError.message
+                })
+            }
+        }
     }
     catch (error) {
         console.error('Error processing admin entry:', error);
