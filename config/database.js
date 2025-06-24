@@ -25,4 +25,4 @@ pool.query('SELECT 1')
     }
   });
 
-module.exports = pool;
+module.exports = pool; 

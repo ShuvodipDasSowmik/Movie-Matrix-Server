@@ -9,20 +9,23 @@ app.use(express.urlencoded({ extended: true }));    // Parse URL-encoded bodies
 app.use(cors());
 
 
-const authRoutes = require('./auth');
-app.use('/', authRoutes);
+// const authRoutes = require('./auth');
+// app.use('/', authRoutes);
 
 const adminEntryRoutes = require('./adminEntry');
 app.use('/', adminEntryRoutes);
-
-const userDashboardRoutes = require('./userDashboard');
-app.use('/', userDashboardRoutes);
 
 const actor = require('./actorDashboard');
 app.use('/', actor);
 
 const media = require('./mediaDashboard');
 app.use('/', media);
+
+const userRoutes = require('./routes/userRoutes');
+app.use('/', userRoutes);
+
+const adminStat = require('./adminStat');
+app.use('/', adminStat);
 
 app.get('/', (req, res) => {
     res.send('MovieMatrix Server is running');
