@@ -14,7 +14,7 @@ class UserController {
             email: user.email
         }
 
-        const accessToken = jwt.sign(payload, process.env.TOKEN_SECRET, { expiresIn: '15m' });
+        const accessToken = jwt.sign(payload, process.env.TOKEN_SECRET, { expiresIn: '60s' });
         const refreshToken = jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET, { expiresIn: '7d' });
 
         return { accessToken, refreshToken };
@@ -185,7 +185,7 @@ class UserController {
     
     static async getUser(req, res) {
         try {
-            const username = req.user.username;
+            const username = req.params.username;
             console.log('User Data Request for ', username);
 
             const userResult = await UserModel.getUserByUsername(username);

@@ -8,18 +8,17 @@ app.use(express.json());    // Parse JSON bodies
 app.use(express.urlencoded({ extended: true }));    // Parse URL-encoded bodies
 app.use(cors());
 
-
-// const authRoutes = require('./auth');
-// app.use('/', authRoutes);
+const refreshToken = require('./routes/refreshToken');
+app.use('/', refreshToken);
 
 const adminEntryRoutes = require('./adminEntry');
 app.use('/', adminEntryRoutes);
 
-const actor = require('./actorDashboard');
-app.use('/', actor);
+const actorRoutes = require('./routes/actorRoutes');
+app.use('/', actorRoutes);
 
-const media = require('./mediaDashboard');
-app.use('/', media);
+const mediaRoutes = require('./routes/mediaRoutes');
+app.use('/', mediaRoutes);
 
 const userRoutes = require('./routes/userRoutes');
 app.use('/', userRoutes);
