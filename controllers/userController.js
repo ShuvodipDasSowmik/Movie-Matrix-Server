@@ -7,6 +7,8 @@ const bcrypt = require('bcryptjs');
 class UserController {
 
     static async generateTokens(user) {
+        console.log("Function Generate Token");
+        
         console.log(user);
 
         const payload = {
@@ -47,7 +49,10 @@ class UserController {
                 role: role || 'USER'
             };
 
-            const { accessToken, refreshToken } = await this.generateTokens(userObj);
+            console.log('Hello : ', userObj);
+            
+
+            const { accessToken, refreshToken } = await UserController.generateTokens(userObj);
 
             // Create expiry dates for tokens
             const refreshExpiry = new Date();
@@ -91,7 +96,7 @@ class UserController {
             if (!user) return res.status(404).json('User not found');
 
             const isPasswordCorrect = bcrypt.compareSync(password, user.password || user.PASSWORD);
-            if (!isPasswordCorrect) return res.status(400).json('Wrong credentials'); const { accessToken, refreshToken } = await this.generateTokens(user);
+            if (!isPasswordCorrect) return res.status(400).json('Wrong credentials'); const { accessToken, refreshToken } = await UserController.generateTokens(user);
 
             // Create expiry dates for tokens
             const refreshExpiry = new Date();
@@ -232,7 +237,7 @@ class UserController {
             if (!userResult.success) {
                 return res.status(404).json({ message: 'User not found' });
             }
-            const user = userResult.user; const { accessToken, refreshToken: newRefreshToken } = await this.generateTokens(user);
+            const user = userResult.user; const { accessToken, refreshToken: newRefreshToken } = await UserController.generateTokens(user);
 
             // Create expiry dates for tokens
             const refreshExpiry = new Date();
