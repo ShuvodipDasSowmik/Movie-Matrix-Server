@@ -4,7 +4,7 @@ const cors = require('cors');
 const app = express();
 
 
-app.use(express.json());    // Parse JSON bodies
+app.use(express.json({limit: '10mb'}));    // Parse JSON bodies
 app.use(express.urlencoded({ extended: true }));    // Parse URL-encoded bodies
 app.use(cors());
 
@@ -22,6 +22,12 @@ app.use('/', mediaRoutes);
 
 const userRoutes = require('./routes/userRoutes');
 app.use('/', userRoutes);
+
+const searchRoutes = require('./routes/searchRoutes');
+app.use('/', searchRoutes);
+
+const blogRoutes = require('./routes/blogRoutes');
+app.use('/', blogRoutes)
 
 const adminStat = require('./adminStat');
 app.use('/', adminStat);
