@@ -37,8 +37,6 @@ class MediaController{
         }
     }
 
-
-
     static async getAllSeries(req, res){
         try {
             const seriesData = await MediaModel.getAllSeries();
@@ -55,9 +53,6 @@ class MediaController{
             })
         }
     }
-
-
-
 
 }
 
