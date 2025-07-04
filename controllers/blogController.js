@@ -47,6 +47,24 @@ class BlogController {
         }
     }
 
+    static async getAllPosts(req, res){
+        try{
+            const postsData = await BlogModel.getAllBlogs();
+
+            return res.status(200).json({
+                message: 'Success',
+                postsData
+            })
+        }
+        catch(error){
+            console.error(error.message);
+            
+            return res.status(500).json({
+                message: error.message
+            })
+        }
+    }
+
     static async GetPostByUsername(req, res){
         try {
             const username = req.params.username;
@@ -64,6 +82,52 @@ class BlogController {
             console.error(error.message);
             
             return res.status(200).json({
+                message: error.message
+            })
+        }
+    }
+
+    static async DeleteBlog(req, res){
+        try{
+            const blogid = req.params.blogid;
+
+            console.log('Delete request received');
+            
+            BlogModel.deleteBlog(blogid);
+
+            console.log('Deleted Successfully');
+            
+
+            return res.status(200).json({
+                message: 'Success'
+            });
+        }
+        catch(error){
+            console.error(error.message);
+            
+            return res.status(500).json({
+                message: error.message
+            })
+        }
+    }
+
+    static async UpdateBlog(req, res){
+        try{
+            const newPostData = req.body;
+            // console.log("FUCKE");
+            
+            // console.log(req.body);
+            
+            BlogModel.updateBlog(newPostData);
+
+            return res.status(200).json({
+                message: 'Success'
+            })
+        }
+        catch(error){
+            console.error(error.message);
+            
+            return res.status(500).json({
                 message: error.message
             })
         }
