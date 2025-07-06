@@ -87,36 +87,10 @@ class BlogController {
         }
     }
 
-    static async DeleteBlog(req, res){
-        try{
-            const blogid = req.params.blogid;
-
-            console.log('Delete request received');
-            
-            BlogModel.deleteBlog(blogid);
-
-            console.log('Deleted Successfully');
-            
-
-            return res.status(200).json({
-                message: 'Success'
-            });
-        }
-        catch(error){
-            console.error(error.message);
-            
-            return res.status(500).json({
-                message: error.message
-            })
-        }
-    }
 
     static async UpdateBlog(req, res){
         try{
             const newPostData = req.body;
-            // console.log("FUCKE");
-            
-            // console.log(req.body);
             
             BlogModel.updateBlog(newPostData);
 
@@ -130,6 +104,149 @@ class BlogController {
             return res.status(500).json({
                 message: error.message
             })
+        }
+    }
+
+
+    static async DeleteBlog(req, res){
+        try {
+            const blogid = req.body.blogid;
+            await BlogController.DeleteBlog(blogid);
+
+            return res.status(200).json({
+                message: 'Success'
+            })
+        }
+        catch (error) {
+            console.error(error.message);            
+
+            return res.status(500).json({
+                message: error.message
+            })
+        }
+    }
+
+    static async UpdateComment(req, res){
+        try{
+            const {blogcommentid, commenttext} = req.body;
+
+            BlogModel.updateComment(blogcommentid, commenttext);
+
+            return res.status(200).json({
+                message: 'Success'
+            })
+        }
+        catch(error){
+            console.error(error.message);
+            
+            return res.status(500).json({
+                message: error.message
+            })
+        }
+    }
+
+    static async AddComment(req, res){
+        try {
+            const commentData = req.body;
+            console.log(commentData);
+            
+            BlogModel.addCommentInBlog(commentData);
+
+            return res.status(200).json({
+                message: 'Success'
+            })
+        }
+        catch (error) {
+            console.error(error.message);
+            
+            return res.status(500).json({
+                message: error.message
+            })
+        }
+    }
+
+    static async DeleteComment(req, res){
+        try {
+            const commentid = req.params.commentid;
+
+            await BlogModel.deleteComment(commentid);
+
+            return res.status(200).json({
+                message: 'Success'
+            });
+        }
+        catch (error) {
+            console.error(error.message);
+            
+            return res.status(500).json({
+                message: error.message
+            });
+        }
+    }
+
+    static async GetCommentsByBlogId(req, res){
+        try {
+            const blogid = req.params.blogid;
+            console.log('Fetching comments for blog ID:', blogid);
+            
+
+            const comments = await BlogModel.getCommentsByBlogId(blogid);
+
+            console.log('Comments fetched:', comments);
+            
+
+            return res.status(200).json({
+                message: 'Success',
+                comments
+            })
+        }
+        catch (error) {
+            console.error(error.message);
+            
+            return res.status(500).json({
+                message: error.message
+            })
+        }
+    }
+
+    static async SetReaction(req, res) {
+        try {
+            const { blogid, username, reaction } = req.body;
+
+            const reactionResult = await BlogModel.setReaction(blogid, username, reaction);
+
+            return res.status(200).json({
+                message: 'Success',
+                reactionResult
+            });
+        }
+        
+        catch (error) {
+            console.error(error.message);
+            
+            return res.status(500).json({
+                message: error.message
+            });
+        }
+    }
+
+    static async RemoveReaction(req, res) {
+        try {
+            const { blogid, username } = req.body;
+
+            await BlogModel.removeReaction(blogid, username);
+
+            return res.status(200).json({
+                message: 'Success'
+            });
+        }
+        
+        catch (error) {
+            console.error(error.message);
+            
+            return res.status(500).json({
+                message: error.message
+            });
         }
     }
 }
