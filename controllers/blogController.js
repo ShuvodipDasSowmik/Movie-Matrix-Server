@@ -91,6 +91,9 @@ class BlogController {
     static async UpdateBlog(req, res){
         try{
             const newPostData = req.body;
+
+            console.log('HELLO: ', newPostData);
+            
             
             BlogModel.updateBlog(newPostData);
 

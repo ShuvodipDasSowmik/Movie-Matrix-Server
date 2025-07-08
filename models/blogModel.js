@@ -45,7 +45,7 @@ class blogModel {
                 const reactorResult = await db.query(reactorQuery, [blog.blogid]);
                 blog.reactors = reactorResult.rows;
 
-                console.log('reactorResult', reactorResult.rows);
+                // console.log('reactorResult', reactorResult.rows);
                 
 
                 blog.comments = blogComments;
@@ -93,7 +93,6 @@ class blogModel {
                 const reactorResult = await db.query(reactorQuery, [blog.blogid]);
                 blog.reactors = reactorResult.rows;    
                 
-                console.log('reactorResult', reactorResult.rows);
                 
                 blog.comments = blogComments;
                 blog.reactions = reactionResult.rows;
@@ -126,7 +125,7 @@ class blogModel {
     static async addCommentInBlog(commentData){
         const {blogid, username, commenttext, commentdate} = commentData;
 
-        console.log(blogid, username, commenttext, commentdate);
+        // console.log(blogid, username, commenttext, commentdate);
         
 
         const commentQuery = `
