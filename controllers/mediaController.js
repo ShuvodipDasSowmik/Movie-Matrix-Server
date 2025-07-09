@@ -54,6 +54,23 @@ class MediaController{
         }
     }
 
+    static async getAllSeasons(req, res){
+        try {
+            const seasonsData = await MediaModel.getAllSeries();
+
+            return res.status(200).json({
+                message: 'Success',
+                seasonsData
+            });
+        }
+        
+        catch (error) {
+            return res.status(404).json({
+                message: error.message
+            })
+        }
+    }
+
 }
 
 module.exports = MediaController;

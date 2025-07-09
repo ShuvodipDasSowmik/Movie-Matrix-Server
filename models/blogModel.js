@@ -12,7 +12,7 @@ class blogModel {
     }
 
     static async getBlogByUsername(username) {
-        const userBlogQuery = `SELECT blogid, content, image, updatedate FROM BLOG WHERE username = $1`;
+        const userBlogQuery = `SELECT blogid, content, image, updatedate FROM BLOG WHERE username = $1 ORDER BY createdate DESC`;
         const userBlogResult = await db.query(userBlogQuery, [username]);
 
         const blogReactionQuery = `
@@ -59,7 +59,7 @@ class blogModel {
     }
 
     static async getAllBlogs() {
-        const blogsQuery = `SELECT blogid, username, content, image, updatedate FROM BLOG`;
+        const blogsQuery = `SELECT blogid, username, content, image, updatedate FROM BLOG ORDER BY createdate DESC`;
         const blogsQResult = await db.query(blogsQuery);
         const blogsResult = blogsQResult.rows;
 
