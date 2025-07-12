@@ -24,7 +24,7 @@ class MediaModel {
         const movieStudioQuery = `SELECT MS.studioid, studioname, picture FROM STUDIO S JOIN MEDIASTUDIO MS ON (MS.studioid = S.studioid) WHERE MS.mediaid = $1`;
         const movieGenreQuery = `SELECT MG.genreid, genrename FROM GENRE G JOIN MEDIAGENRE MG ON (MG.genreid = G.genreid) WHERE MG.mediaid = $1`;
         const movieDirectorQuery = `SELECT MD.directorid, directorname, picture FROM DIRECTOR D JOIN MEDIADIRECTOR MD ON (MD.directorid = D.directorid) WHERE MD.mediaid = $1`;
-
+        const movieAwardQuery = `SELECT ma.mediaid, a.awardname, a.awardcategory, ma.year FROM mediaaward ma JOIN award a ON ma.awardid = a.awardid WHERE ma.mediaid = $1`;
 
         const movieResult = await db.query(movieQuery, [mediaid]);
         const movieData = movieResult.rows[0];
@@ -35,11 +35,13 @@ class MediaModel {
         const movieStudio = await db.query(movieStudioQuery, [mediaid]);
         const movieGenre = await db.query(movieGenreQuery, [mediaid]);
         const movieDirector = await db.query(movieDirectorQuery, [mediaid]);
+        const movieAward = await db.query(movieAwardQuery, [mediaid]);
 
         movieData.cast = movieActor.rows;
         movieData.studio = movieStudio.rows;
         movieData.director = movieDirector.rows;
         movieData.genre = movieGenre.rows;
+        movieData.awards = movieAward.rows;
 
         console.log(movieData);
 
