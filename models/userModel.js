@@ -3,6 +3,19 @@ const bcrypt = require('bcryptjs')
 
 class User {
 
+    static async getAllUser(){
+        try {
+            const query = `SELECT * FROM SYSTEMUSER`;
+            const result = await db.query(query);
+            return result.rows;
+        } 
+        
+        catch (error) {
+            console.error('Error fetching all users:', error);
+            throw error;
+        }
+    }
+
     static async createUser(userData) {
         try {
             const { fullName, userName, email, password, dob, role } = userData;

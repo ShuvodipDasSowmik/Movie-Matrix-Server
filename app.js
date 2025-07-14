@@ -8,6 +8,8 @@ app.use(express.json({limit: '10mb'}));    // Parse JSON bodies
 app.use(express.urlencoded({ extended: true }));    // Parse URL-encoded bodies
 app.use(cors());
 
+app.set('trust proxy', true);
+
 const refreshToken = require('./routes/refreshToken');
 app.use('/', refreshToken);
 

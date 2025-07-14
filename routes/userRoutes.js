@@ -8,5 +8,7 @@ router.post('/signup', userController.signUp);
 router.post('/signin', ((req, res) => userController.signIn(req, res)));
 router.get('/user/:username', verifyToken, userController.getUser);
 router.post('/refresh-token', userController.refreshToken);
+router.get('/users', verifyToken, userController.getAllUsers);
+router.post('/track-activity', userController.TrackUserActivity);
 
 module.exports = router;

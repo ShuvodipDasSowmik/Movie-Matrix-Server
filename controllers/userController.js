@@ -3,6 +3,7 @@ const db = require('../config/database');
 const UserModel = require('../models/userModel');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const UAParser = require('ua-parser-js');
 
 class UserController {
 
@@ -256,6 +257,82 @@ class UserController {
         catch (error) {
             console.error('Error in refreshToken process:', error);
             return res.status(500).json({ message: 'Server error', error: error.message });
+        }
+    }
+
+    static async getAllUsers(req, res) {
+        try {
+            console.log('Fetching all users');
+            
+            const users = await UserModel.getAllUser();
+
+            return res.status(200).json({
+                message: 'Success',
+                users
+            });
+        }
+        
+        catch (error) {
+            console.error('Error fetching all users:', error);
+
+            return res.status(500).json({
+                message: 'Server error',
+                error: error.message
+            });
+        }
+    }
+
+    static async TrackUserActivity(req, res) {
+        try{
+            const ipAddress = req.ip;
+            console.log('IP Address:', ipAddress);
+
+            const visitorID = req.visitorID;
+            const userAgent = req.headers['user-agent'];
+
+            const parser = new UAParser();
+            const ua = parser.setUA(userAgent).getResult();
+
+            const geoRes = await fetch(`https://ipapi.co/${req.ip}/json/`);
+            const geoData = await geoRes.json();
+
+            const userActivity = {
+                ipAddress,
+                visitorID,
+                country: geoData.country_name || 'Unknown',
+                city: geoData.city || 'Unknown',
+                district: geoData.district || 'Unknown',
+                zip: geoData.zip || 'Unknown',
+                userAgent: ua.ua,
+                browser: ua.browser.name,
+                os: ua.os.name,
+                device: ua.device.model || 'Unknown'
+            };
+
+            console.log('User Activity:', userActivity);
+
+            const insertQuery = `
+                INSERT INTO USER_ACTIVITY (IP_ADDRESS, VISITOR_ID, COUNTRY, CITY, DISTRICT, ZIP, USER_AGENT, BROWSER, OS, DEVICE)
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+            `;
+
+            await db.query(insertQuery, [
+                userActivity.ipAddress,
+                userActivity.visitorID,
+                userActivity.country,
+                userActivity.city,
+                userActivity.district,
+                userActivity.zip,
+                userActivity.userAgent,
+                userActivity.browser,
+                userActivity.os,
+                userActivity.device
+            ]);
+
+        }
+        catch(error) {
+            console.error('Error tracking user activity:', error);
+            return res.status(500).json({ message: 'Internal server error' });
         }
     }
 }
