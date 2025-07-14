@@ -4,6 +4,7 @@ const UserModel = require('../models/userModel');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const UAParser = require('ua-parser-js');
+const { default: axios } = require('axios');
 
 class UserController {
 
@@ -287,14 +288,14 @@ class UserController {
             const ipAddress = req.ip;
             console.log('IP Address:', ipAddress);
 
-            const visitorID = req.visitorID;
+            const visitorID = req.body.visitorID;
             const userAgent = req.headers['user-agent'];
 
             const parser = new UAParser();
             const ua = parser.setUA(userAgent).getResult();
 
-            const geoRes = await fetch(`http://ip-api.com/json/${ipAddress}`);
-            const geoData = await geoRes.json();
+            const geoData = await axios.get(`http://ip-api.com/json/${ipAddress}`);
+            // const geoData = await geoRes.json();
 
             const userActivity = {
                 ipAddress,
@@ -302,6 +303,7 @@ class UserController {
                 country: geoData.country_name || 'Unknown',
                 city: geoData.city || 'Unknown',
                 district: geoData.district || 'Unknown',
+                regionName: geoData.regionName || 'Unknown',
                 zip: geoData.zip || 'Unknown',
                 userAgent: ua.ua,
                 browser: ua.browser.name,
@@ -312,7 +314,7 @@ class UserController {
             console.log('User Activity:', userActivity);
 
             const insertQuery = `
-                INSERT INTO USER_ACTIVITY (IP_ADDRESS, VISITOR_ID, COUNTRY, CITY, DISTRICT, ZIP, USER_AGENT, BROWSER, OS, DEVICE)
+                INSERT INTO USER_ACTIVITY (IP_ADDRESS, VISITOR_ID, COUNTRY, CITY, DISTRICT, ZIP, USER_AGENT, BROWSER, OS, DEVICE, REGIONNAME)
                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
             `;
 
@@ -326,7 +328,8 @@ class UserController {
                 userActivity.userAgent,
                 userActivity.browser,
                 userActivity.os,
-                userActivity.device
+                userActivity.device,
+                userActivity.regionName
             ]);
 
         }
