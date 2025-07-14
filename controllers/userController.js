@@ -315,7 +315,7 @@ class UserController {
 
             const insertQuery = `
                 INSERT INTO USER_ACTIVITY (IP_ADDRESS, VISITOR_ID, COUNTRY, CITY, DISTRICT, ZIP, USER_AGENT, BROWSER, OS, DEVICE, REGIONNAME)
-                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
             `;
 
             await db.query(insertQuery, [
