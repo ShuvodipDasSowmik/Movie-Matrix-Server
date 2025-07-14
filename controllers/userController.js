@@ -293,7 +293,7 @@ class UserController {
             const parser = new UAParser();
             const ua = parser.setUA(userAgent).getResult();
 
-            const geoRes = await fetch(`https://ipapi.co/${req.ip}/json/`);
+            const geoRes = await fetch(`http://ip-api.com/json/${ipAddress}`);
             const geoData = await geoRes.json();
 
             const userActivity = {
