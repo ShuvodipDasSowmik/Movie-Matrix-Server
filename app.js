@@ -13,8 +13,8 @@ app.set('trust proxy', true);
 const refreshToken = require('./routes/refreshToken');
 app.use('/', refreshToken);
 
-const adminEntryRoutes = require('./adminEntry');
-app.use('/', adminEntryRoutes);
+const adminRoutes = require('./routes/adminRoutes');
+app.use('/', adminRoutes);
 
 const actorRoutes = require('./routes/actorRoutes');
 app.use('/', actorRoutes);
@@ -29,10 +29,7 @@ const searchRoutes = require('./routes/searchRoutes');
 app.use('/', searchRoutes);
 
 const blogRoutes = require('./routes/blogRoutes');
-app.use('/', blogRoutes)
-
-const adminStat = require('./adminStat');
-app.use('/', adminStat);
+app.use('/', blogRoutes);
 
 const watchlist = require('./routes/watchlistRoutes');
 app.use('/', watchlist);

@@ -24,6 +24,44 @@ class reviewModel {
             throw error;
         }
     }
+
+
+    static async createMovieReview(reviewData) {
+        const { username, mediaid, comment, userrating, reviewdate } = reviewData;
+
+        const query = `
+            INSERT INTO MOVIEREVIEW (username, mediaid, comment, userrating, reviewdate)
+            VALUES ($1, $2, $3, $4, $5)
+        `;
+        const result = await db.query(query, [username, mediaid, comment, userrating, reviewdate]);
+
+        return result.rowCount > 0;
+    }
+
+    static async deleteMovieReview(reviewData) {
+        const { username, mediaid } = reviewData;
+
+        const query = `
+            DELETE FROM MOVIEREVIEW
+            WHERE username = $1 AND mediaid = $2
+        `;
+        const result = await db.query(query, [username, mediaid]);
+
+        return result.rowCount > 0;
+    }
+
+    static async updateMovieReview(reviewData) {
+        const { username, mediaid, comment, userrating, reviewdate } = reviewData;
+
+        const query = `
+            UPDATE MOVIEREVIEW
+            SET comment = $1, userrating = $2, reviewdate = $3
+            WHERE username = $4 AND mediaid = $5
+        `;
+        const result = await db.query(query, [comment, userrating, reviewdate, username, mediaid]);
+
+        return result.rowCount > 0;
+    }
 }
 
 

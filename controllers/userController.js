@@ -294,15 +294,13 @@ class UserController {
             const parser = new UAParser();
             const ua = parser.setUA(userAgent).getResult();
 
-            const geoData = await axios.get(`http://ip-api.com/json/${ipAddress}`);
-            // const geoData = await geoRes.json();
+            const geoRes = await axios.get(`http://ip-api.com/json/${ipAddress}`);
 
             const userActivity = {
                 ipAddress,
                 visitorID,
-                country: geoData.country_name || 'Unknown',
+                country: geoData.country || 'Unknown',
                 city: geoData.city || 'Unknown',
-                district: geoData.district || 'Unknown',
                 regionName: geoData.regionName || 'Unknown',
                 zip: geoData.zip || 'Unknown',
                 userAgent: ua.ua,
