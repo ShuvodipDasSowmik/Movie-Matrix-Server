@@ -103,22 +103,9 @@ class WatchlistModel{
         return result.rows;
     }
 
-    static async toggleIsWatched(watchlistid, mediaid) {
-        const toggleQuery = `
-            UPDATE WATCHLISTMEDIA
-            SET iswatched = NOT iswatched
-            WHERE watchlistid = $1 AND mediaid = $2
-        `;
-        await db.query(toggleQuery, [watchlistid, mediaid]);
 
-        return {
-            success: true,
-            message: `Watch status for media ${mediaid} in watchlist ${watchlistid} toggled successfully`
-        };
-    }
+    static async toggleIsWatched(watchlistid, mediaids) {
 
-    static async togglesWatched(watchlistid, mediaids) {
-        // mediaids: array of mediaid to toggle
         await Promise.all(
             mediaids.map(async (mediaid) => {
                 const toggleQuery = `
@@ -129,6 +116,7 @@ class WatchlistModel{
                 await db.query(toggleQuery, [watchlistid, mediaid]);
             })
         );
+
         return {
             success: true,
             message: `Watch status toggled for ${mediaids.length} media items in watchlist ${watchlistid}`

@@ -28,7 +28,9 @@ exports.handleAdminEntry = async (req, res) => {
             default:
                 return res.status(400).json({ message: 'Invalid dataType' });
         }
-    } catch (error) {
+    }
+    
+    catch (error) {
         console.error('Error processing admin entry:', error);
         return res.status(500).json('Internal server error');
     }
@@ -43,8 +45,32 @@ exports.getAdminStats = async (req, res) => {
             message: 'Success',
             statResult
         });
-    } catch (error) {
+
+    }
+    
+    catch (error) {
         console.error('Error fetching admin statistics:', error);
         return res.status(500).json({ error: 'Internal server error' });
     }
 };
+
+exports.sendEmail = async (req, res) => {
+    const {users, message, subject} = req.body;
+
+    try {
+        console.log('Sending email to users:', users);
+        console.log('Message:', message);
+
+        const reponse = await AdminModel.sendEmail(users, subject, message);
+
+        return res.status(200).json({
+            message: 'Emails sent successfully',
+            users
+        });
+    } 
+    
+    catch (error) {
+        console.error('Error sending email:', error);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+}

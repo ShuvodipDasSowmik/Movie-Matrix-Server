@@ -170,7 +170,9 @@ class User {
         try {
             const query = `INSERT INTO refresh_token (token, user_id, expiry) VALUES ($1, $2, $3)`;
             await db.query(query, [token, userId, expiry]);
-        } catch (error) {
+        }
+        
+        catch (error) {
             console.error('Error adding refresh token:', error.message);
             throw new Error(error.message);
         }

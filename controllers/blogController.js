@@ -71,7 +71,7 @@ class BlogController {
 
             const userBlogData = await BlogModel.getBlogByUsername(username);
 
-            console.log(userBlogData);
+            // console.log(userBlogData);
             
             return res.status(200).json({
                 message: 'Success',
@@ -151,7 +151,7 @@ class BlogController {
     static async AddComment(req, res){
         try {
             const commentData = req.body;
-            console.log(commentData);
+            // console.log(commentData);
             
             BlogModel.addCommentInBlog(commentData);
 
@@ -190,7 +190,7 @@ class BlogController {
     static async GetCommentsByBlogId(req, res){
         try {
             const blogid = req.params.blogid;
-            console.log('Fetching comments for blog ID:', blogid);
+            // console.log('Fetching comments for blog ID:', blogid);
             
 
             const comments = await BlogModel.getCommentsByBlogId(blogid);

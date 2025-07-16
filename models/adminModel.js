@@ -1,4 +1,5 @@
 const db = require('../config/database');
+require('dotenv').config();
 
 class AdminModel {
     static async insertGenres(genreValues, res) {
@@ -309,11 +310,60 @@ class AdminModel {
             `;
 
             const result = await db.query(statQuery);
+            
             return result.rows[0];
-        } catch (error) {
+        }
+        
+        catch (error) {
             throw error;
         }
     }
+
+    static async sendEmail(users, subject, body) {
+        const nodemailer = require('nodemailer');
+
+        const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS 
+            }
+        });
+
+        try {
+            const results = await Promise.all(users.map(async (user) => {
+                const personalizedBody = `Dear ${user.username},\n\n${body}\n\nRegards,\nMovie Matrix Admin`;
+                
+                const mailOptions = {
+                    from: process.env.EMAIL_USER,
+                    to: user.email,
+                    subject: subject,
+                    text: personalizedBody
+                };
+
+                return transporter.sendMail(mailOptions);
+            }));
+
+            
+            return {
+                success: true,
+                message: `${users.length} emails sent successfully`,
+                details: {
+                    sent: results.length
+                }
+            };
+        }
+        catch (err) {
+            console.log("Error: ", err.message);
+            
+            return {
+                success: false,
+                message: 'Failed to send emails',
+                error: err.message
+            };
+        }
+    }
+
 }
 
 module.exports = AdminModel;

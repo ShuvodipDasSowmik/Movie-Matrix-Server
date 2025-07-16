@@ -9,16 +9,13 @@ const { default: axios } = require('axios');
 class UserController {
 
     static async generateTokens(user) {
-        console.log("Function Generate Token");
         
-        console.log(user);
-
         const payload = {
             username: user.username,
             email: user.email
         }
 
-        const accessToken = jwt.sign(payload, process.env.TOKEN_SECRET, { expiresIn: '60s' });
+        const accessToken = jwt.sign(payload, process.env.TOKEN_SECRET, { expiresIn: '60m' });
         const refreshToken = jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET, { expiresIn: '7d' });
 
         return { accessToken, refreshToken };
@@ -50,8 +47,6 @@ class UserController {
                 email: email,
                 role: role || 'USER'
             };
-
-            console.log('Hello : ', userObj);
             
 
             const { accessToken, refreshToken } = await UserController.generateTokens(userObj);
@@ -143,7 +138,10 @@ class UserController {
 
     static async logout(req, res) {
         try {
-            const username = req.username;
+            const username = req.body.username;
+
+            console.log('Logout request for user:', username);
+            
             await UserModel.clearRefreshTokensForUser(username);
 
             res.status(200).json({
@@ -294,7 +292,7 @@ class UserController {
             const parser = new UAParser();
             const ua = parser.setUA(userAgent).getResult();
 
-            const geoRes = await axios.get(`http://ip-api.com/json/${ipAddress}`);
+            const geoData = await axios.get(`http://ip-api.com/json/${ipAddress}`);
 
             const userActivity = {
                 ipAddress,

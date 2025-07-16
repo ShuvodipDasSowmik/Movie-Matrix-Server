@@ -29,7 +29,7 @@ class WatchlistController {
 
             await WatchlistModel.createWatchlist(watchlistData);
 
-            res.status(201).json({
+            res.status(200).json({
                 success: true,
                 message: 'Watchlist created successfully'
             });
@@ -156,34 +156,16 @@ class WatchlistController {
         }
     }
 
+
     static async toggleIsWatched(req, res) {
         try {
-            const { watchlistid, mediaid } = req.params;
+            const { watchlistid } = req.body;
+            const { medias } = req.body;
 
-            const result = await WatchlistModel.toggleIsWatched(watchlistid, mediaid);
+            console.log(watchlistid, medias);
+            
 
-            res.status(200).json({
-                success: true,
-                message: result.message
-            });
-        }
-
-        catch (error) {
-            console.error('Error toggling watch status:', error.message);
-
-            res.status(500).json({
-                success: false,
-                message: 'Internal Server Error'
-            });
-        }
-    }
-
-    static async togglesWatched(req, res) {
-        try {
-            const { watchlistid } = req.params;
-            const { mediaids } = req.body; // expects array of mediaids
-
-            const result = await WatchlistModel.togglesWatched(watchlistid, mediaids);
+            const result = await WatchlistModel.toggleIsWatched(watchlistid, medias);
 
             res.status(200).json({
                 success: true,

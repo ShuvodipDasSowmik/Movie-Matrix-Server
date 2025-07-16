@@ -10,5 +10,6 @@ router.get('/user/:username', verifyToken, userController.getUser);
 router.post('/refresh-token', userController.refreshToken);
 router.get('/users', verifyToken, userController.getAllUsers);
 router.post('/track-activity', userController.TrackUserActivity);
+router.post('/logout', verifyToken, userController.logout);
 
 module.exports = router;
