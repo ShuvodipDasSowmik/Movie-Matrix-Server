@@ -3,20 +3,19 @@ const db = require('../config/database');
 const UserModel = require('../models/userModel');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const UAParser = require('ua-parser-js');
+const { default: axios } = require('axios');
 
 class UserController {
 
     static async generateTokens(user) {
-        console.log("Function Generate Token");
         
-        console.log(user);
-
         const payload = {
             username: user.username,
             email: user.email
         }
 
-        const accessToken = jwt.sign(payload, process.env.TOKEN_SECRET, { expiresIn: '60s' });
+        const accessToken = jwt.sign(payload, process.env.TOKEN_SECRET, { expiresIn: '60m' });
         const refreshToken = jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET, { expiresIn: '7d' });
 
         return { accessToken, refreshToken };
@@ -48,8 +47,6 @@ class UserController {
                 email: email,
                 role: role || 'USER'
             };
-
-            console.log('Hello : ', userObj);
             
 
             const { accessToken, refreshToken } = await UserController.generateTokens(userObj);
@@ -141,7 +138,10 @@ class UserController {
 
     static async logout(req, res) {
         try {
-            const username = req.username;
+            const username = req.body.username;
+
+            console.log('Logout request for user:', username);
+            
             await UserModel.clearRefreshTokensForUser(username);
 
             res.status(200).json({
@@ -256,6 +256,82 @@ class UserController {
         catch (error) {
             console.error('Error in refreshToken process:', error);
             return res.status(500).json({ message: 'Server error', error: error.message });
+        }
+    }
+
+    static async getAllUsers(req, res) {
+        try {
+            console.log('Fetching all users');
+            
+            const users = await UserModel.getAllUser();
+
+            return res.status(200).json({
+                message: 'Success',
+                users
+            });
+        }
+        
+        catch (error) {
+            console.error('Error fetching all users:', error);
+
+            return res.status(500).json({
+                message: 'Server error',
+                error: error.message
+            });
+        }
+    }
+
+    static async TrackUserActivity(req, res) {
+        try{
+            const ipAddress = req.ip;
+            console.log('IP Address:', ipAddress);
+
+            const visitorID = req.body.visitorID;
+            const userAgent = req.headers['user-agent'];
+
+            const parser = new UAParser();
+            const ua = parser.setUA(userAgent).getResult();
+
+            const geoData = await axios.get(`http://ip-api.com/json/${ipAddress}`);
+
+            const userActivity = {
+                ipAddress,
+                visitorID,
+                country: geoData.country || 'Unknown',
+                city: geoData.city || 'Unknown',
+                regionName: geoData.regionName || 'Unknown',
+                zip: geoData.zip || 'Unknown',
+                userAgent: ua.ua,
+                browser: ua.browser.name,
+                os: ua.os.name,
+                device: ua.device.model || 'Unknown'
+            };
+
+            console.log('User Activity:', userActivity);
+
+            const insertQuery = `
+                INSERT INTO USER_ACTIVITY (IP_ADDRESS, VISITOR_ID, COUNTRY, CITY, DISTRICT, ZIP, USER_AGENT, BROWSER, OS, DEVICE, REGIONNAME)
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+            `;
+
+            await db.query(insertQuery, [
+                userActivity.ipAddress,
+                userActivity.visitorID,
+                userActivity.country,
+                userActivity.city,
+                userActivity.district,
+                userActivity.zip,
+                userActivity.userAgent,
+                userActivity.browser,
+                userActivity.os,
+                userActivity.device,
+                userActivity.regionName
+            ]);
+
+        }
+        catch(error) {
+            console.error('Error tracking user activity:', error);
+            return res.status(500).json({ message: 'Internal server error' });
         }
     }
 }

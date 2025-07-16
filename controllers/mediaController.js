@@ -54,22 +54,7 @@ class MediaController{
         }
     }
 
-    static async getAllSeries(req, res){
-        try {
-            const seriesData = await MediaModel.getAllSeries();
 
-            return res.status(200).json({
-                message: 'Success',
-                seriesData
-            });
-        }
-        
-        catch (error) {
-            return res.status(404).json({
-                message: error.message
-            })
-        }
-    }
 
     static async getSeriesByID(req, res){
         try {
@@ -91,11 +76,14 @@ class MediaController{
     }
 
 
-            const seriesData = await MediaModel.getSeriesByID(mediaid);
+     static async getEpisodesByID(req, res){
+        try {
+            const seasonid = req.params.seasonid;
+            const episodesData = await MediaModel.getEpisodesByID(seasonid);
 
             return res.status(200).json({
                 message: 'Success',
-                seriesData
+                episodesData
             });
         }
         

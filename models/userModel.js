@@ -3,6 +3,19 @@ const bcrypt = require('bcryptjs')
 
 class User {
 
+    static async getAllUser(){
+        try {
+            const query = `SELECT * FROM SYSTEMUSER`;
+            const result = await db.query(query);
+            return result.rows;
+        } 
+        
+        catch (error) {
+            console.error('Error fetching all users:', error);
+            throw error;
+        }
+    }
+
     static async createUser(userData) {
         try {
             const { fullName, userName, email, password, dob, role } = userData;
@@ -157,7 +170,9 @@ class User {
         try {
             const query = `INSERT INTO refresh_token (token, user_id, expiry) VALUES ($1, $2, $3)`;
             await db.query(query, [token, userId, expiry]);
-        } catch (error) {
+        }
+        
+        catch (error) {
             console.error('Error adding refresh token:', error.message);
             throw new Error(error.message);
         }
