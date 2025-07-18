@@ -8,11 +8,13 @@ app.use(express.json({limit: '10mb'}));    // Parse JSON bodies
 app.use(express.urlencoded({ extended: true }));    // Parse URL-encoded bodies
 app.use(cors());
 
+app.set('trust proxy', true);
+
 const refreshToken = require('./routes/refreshToken');
 app.use('/', refreshToken);
 
-const adminEntryRoutes = require('./adminEntry');
-app.use('/', adminEntryRoutes);
+const adminRoutes = require('./routes/adminRoutes');
+app.use('/', adminRoutes);
 
 const actorRoutes = require('./routes/actorRoutes');
 app.use('/', actorRoutes);
@@ -27,10 +29,13 @@ const searchRoutes = require('./routes/searchRoutes');
 app.use('/', searchRoutes);
 
 const blogRoutes = require('./routes/blogRoutes');
-app.use('/', blogRoutes)
+app.use('/', blogRoutes);
 
-const adminStat = require('./adminStat');
-app.use('/', adminStat);
+const watchlist = require('./routes/watchlistRoutes');
+app.use('/', watchlist);
+
+const genre = require('./routes/genrePrefRoutes');
+app.use('/', genre);
 
 app.get('/', (req, res) => {
     res.send('MovieMatrix Server is running');
