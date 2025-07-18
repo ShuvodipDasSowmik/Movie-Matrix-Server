@@ -15,6 +15,8 @@ class reviewModel {
                     mediaid = $1
             `;
             const result = await db.query(query, [mediaId]);
+            console.log(`Fetched reviews for media ID ${mediaId}:`, result.rows);
+            
 
             return result.rows;
         }

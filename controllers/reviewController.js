@@ -3,7 +3,8 @@ const ReviewModel = require('../models/reviewModel');
 class ReviewController {
 
     static async getMovieReviewByID(req, res) {
-        const mediaId = req.params.mediaId;
+        const mediaId = req.params.mediaid;
+
         try {
             const reviews = await ReviewModel.getMovieReviewByID(mediaId);
 
@@ -25,11 +26,13 @@ class ReviewController {
     static async createMovieReview(req, res) {
         const reviewData = req.body;
 
+        console.log(reviewData);
+        
         try {
             const success = await ReviewModel.createMovieReview(reviewData);
 
             if (success) {
-                res.status(201).json({
+                res.status(200).json({
                     message: 'Review created successfully'
                 });
             }
