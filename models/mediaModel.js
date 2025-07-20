@@ -6,7 +6,6 @@ class MediaModel {
     static async getAllMovies() {
         const moviesQuery = `SELECT mediaid, language, title, releaseyear, poster, overallrating, pgrating FROM MEDIA WHERE mediatype = \'movie\'`;
 
-
         const movieResult = await db.query(moviesQuery);
         const movieData = movieResult.rows;
 
@@ -113,6 +112,16 @@ class MediaModel {
         console.log(seriesData);
 
         return seriesData;
+    }
+
+    static async getEpisodesByID(seasonid) {
+        const episodesQuery = `SELECT E.* FROM EPISODES E JOIN SEASON S ON (S.seasonid = E.seasonid) WHERE S.seasonid = $1`;
+
+
+        const episodesResult = await db.query(episodesQuery, [seasonid]);
+        const episodesData = episodesResult.rows;
+
+        return episodesData;
     }
 
 }
