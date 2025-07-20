@@ -113,8 +113,8 @@ class BlogController {
 
     static async DeleteBlog(req, res){
         try {
-            const blogid = req.params.blogid;
-            await BlogModel.deleteBlog(blogid);
+            const blogid = req.body.blogid;
+            await BlogController.DeleteBlog(blogid);
 
             return res.status(200).json({
                 message: 'Success'

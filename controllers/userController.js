@@ -25,7 +25,7 @@ class UserController {
         try {
             const { fullName, userName, email, password, dob, role } = req.body;
 
-            console.log(req.body);
+            // console.log(req.body);
 
             const existQuery = 'SELECT * FROM systemuser WHERE username = $1 OR email = $2';
 
@@ -33,11 +33,11 @@ class UserController {
             const rows = result.rows;
 
             if (rows.length) {
-                console.log('User already exists:', { userName, email });
+                // console.log('User already exists:', { userName, email });
                 return res.status(409).json('User already exists!');
             }
 
-            console.log('User does not exist, creating new user:', { userName, email });
+            // console.log('User does not exist, creating new user:', { userName, email });
 
             await UserModel.createUser({ fullName, userName, email, password, dob, role, res });
 
@@ -83,11 +83,11 @@ class UserController {
 
     static async signIn(req, res) {
         try {
-            console.log('SignIn Request Body:', req.body);
+            // console.log('SignIn Request Body:', req.body);
             
             const { username, password } = req.body;
 
-            console.log('SignIn Credentials:', username, " ", password);
+            // console.log('SignIn Credentials:', username, " ", password);
 
             const user = await UserModel.getUserWithPasswordByUsername(username);
             if (!user) return res.status(404).json('User not found');
@@ -115,7 +115,7 @@ class UserController {
                 accessExpiry
             );
 
-            console.log('Tokens generated successfully:', { accessToken, refreshToken }); 
+            // console.log('Tokens generated successfully:', { accessToken, refreshToken }); 
 
             res.json({
                 accessToken,
@@ -126,7 +126,7 @@ class UserController {
                     role: user.role || user.ROLE
                 }
             });
-            console.log('Signin successful:', { username });
+            // console.log('Signin successful:', { username });
         }
 
         catch (error) {
@@ -140,7 +140,7 @@ class UserController {
         try {
             const username = req.body.username;
 
-            console.log('Logout request for user:', username);
+            // console.log('Logout request for user:', username);
             
             await UserModel.clearRefreshTokensForUser(username);
 
@@ -191,7 +191,7 @@ class UserController {
     static async getUser(req, res) {
         try {
             const username = req.params.username;
-            console.log('User Data Request for ', username);
+            // console.log('User Data Request for ', username);
 
             const userResult = await UserModel.getUserByUsername(username);
 
@@ -200,7 +200,7 @@ class UserController {
             }
 
             const user = userResult.user;
-            console.log('User data found:', user);
+            // console.log('User data found:', user);
 
             return res.status(200).json({
                 username: user.username,
@@ -261,7 +261,7 @@ class UserController {
 
     static async getAllUsers(req, res) {
         try {
-            console.log('Fetching all users');
+            // console.log('Fetching all users');
             
             const users = await UserModel.getAllUser();
 
@@ -292,13 +292,25 @@ class UserController {
             const parser = new UAParser();
             const ua = parser.setUA(userAgent).getResult();
 
-            const geoData = await axios.get(`http://ip-api.com/json/${ipAddress}`);
+            const url = `https://free.freeipapi.com/api/json/${ipAddress}`;
+            let geoData;
 
+            try {
+                const geoResponse = await axios.get(url);
+                geoData = geoResponse.data;
+            }
+            catch (error) {
+                console.error('Error fetching geo data:', error);
+                return res.status(500).json({ message: 'Failed to fetch geo data' });
+            }
+
+            console.log('Geo Data:', geoData);
+            
             const userActivity = {
                 ipAddress,
                 visitorID,
-                country: geoData.country || 'Unknown',
-                city: geoData.city || 'Unknown',
+                country: geoData.countryName || 'Unknown',
+                city: geoData.cityName || 'Unknown',
                 regionName: geoData.regionName || 'Unknown',
                 zip: geoData.zip || 'Unknown',
                 userAgent: ua.ua,

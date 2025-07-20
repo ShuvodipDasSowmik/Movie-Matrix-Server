@@ -34,6 +34,12 @@ app.use('/', blogRoutes);
 const watchlist = require('./routes/watchlistRoutes');
 app.use('/', watchlist);
 
+const genre = require('./routes/genrePrefRoutes');
+app.use('/', genre);
+
+const reviewRoutes = require('./routes/reviewRoutes');
+app.use('/', reviewRoutes);
+
 app.get('/', (req, res) => {
     res.send('MovieMatrix Server is running');
 });
