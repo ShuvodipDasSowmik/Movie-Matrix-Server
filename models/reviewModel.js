@@ -64,6 +64,32 @@ class reviewModel {
 
         return result.rowCount > 0;
     }
+
+    static async getEpisodeReviewByID(mediaId) {
+        try {
+            const query = `
+                SELECT
+                    username,
+                    comment,
+                    userrating,
+                    reviewdate
+                FROM
+                    EPISODEREVIEW
+                WHERE
+                    episodeid = $1
+            `;
+
+            const result = await db.query(query, [mediaId]);
+            console.log(`Fetched series reviews for media ID ${mediaId}:`, result.rows);
+            
+            return result.rows;
+        }
+        
+        catch (error) {
+            console.error('Error fetching series reviews:', error);
+            throw error;
+        }
+    }
 }
 
 

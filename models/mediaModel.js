@@ -65,57 +65,45 @@ class MediaModel {
         const seriesStudioQuery = `SELECT MS.studioid, studioname, picture FROM STUDIO STU JOIN MEDIASTUDIO MS ON (MS.studioid = STU.studioid) WHERE MS.mediaid = $1`;
         const seriesGenreQuery = `SELECT MG.genreid, genrename FROM GENRE G JOIN MEDIAGENRE MG ON (MG.genreid = G.genreid) WHERE MG.mediaid = $1`;
         const seriesDirectorQuery = `SELECT MD.directorid, directorname, picture FROM DIRECTOR D JOIN MEDIADIRECTOR MD ON (MD.directorid = D.directorid) WHERE MD.mediaid = $1`;
-
+        const seasonsQuery = `SELECT * FROM SEASON WHERE mediaid = $1 ORDER BY seasonid ASC`;
+        const seriesAwardQuery = `SELECT ma.mediaid, a.awardname, a.awardcategory, ma.year FROM mediaaward ma JOIN award a ON ma.awardid = a.awardid WHERE ma.mediaid = $1`;
+        
         const seriesResult = await db.query(seriesQuery, [mediaid]);
         const seriesData = seriesResult.rows[0];
 
-        console.log('Series Data: ', seriesData);
+        // console.log('Series Data: ', seriesData);
 
         const seriesActor = await db.query(seriesActorQuery, [mediaid]);
         const seriesStudio = await db.query(seriesStudioQuery, [mediaid]);
         const seriesGenre = await db.query(seriesGenreQuery, [mediaid]);
         const seriesDirector = await db.query(seriesDirectorQuery, [mediaid]);
+        const seasonsResult = await db.query(seasonsQuery, [mediaid]);
+        const seriesAward = await db.query(seriesAwardQuery, [mediaid]);
 
         seriesData.cast = seriesActor.rows;
         seriesData.studio = seriesStudio.rows;
         seriesData.director = seriesDirector.rows;
         seriesData.genre = seriesGenre.rows;
+        seriesData.seasons = seasonsResult.rows;
+        seriesData.awards = seriesAward.rows;
 
-        console.log(seriesData);
-
-        return seriesData;
-    }
-
-
-    static async getSeriesByID(mediaid) {
-        // Use Of SUB-QUERIES
-        const seriesQuery = `SELECT M.*, S.isongoing FROM MEDIA M JOIN TVSERIES S ON (M.mediaid = S.mediaid) WHERE M.mediaid = $1`;
-        const seriesActorQuery = `SELECT MA.actorid, actorname, picture FROM ACTOR A JOIN MEDIAACTOR MA ON (A.actorid = MA.actorid) WHERE MA.mediaid = $1`;
-        const seriesStudioQuery = `SELECT MS.studioid, studioname, picture FROM STUDIO STU JOIN MEDIASTUDIO MS ON (MS.studioid = STU.studioid) WHERE MS.mediaid = $1`;
-        const seriesGenreQuery = `SELECT MG.genreid, genrename FROM GENRE G JOIN MEDIAGENRE MG ON (MG.genreid = G.genreid) WHERE MG.mediaid = $1`;
-        const seriesDirectorQuery = `SELECT MD.directorid, directorname, picture FROM DIRECTOR D JOIN MEDIADIRECTOR MD ON (MD.directorid = D.directorid) WHERE MD.mediaid = $1`;
-
-        const seriesResult = await db.query(seriesQuery, [mediaid]);
-        const seriesData = seriesResult.rows[0];
-
-        console.log('Series Data: ', seriesData);
-
-        const seriesActor = await db.query(seriesActorQuery, [mediaid]);
-        const seriesStudio = await db.query(seriesStudioQuery, [mediaid]);
-        const seriesGenre = await db.query(seriesGenreQuery, [mediaid]);
-        const seriesDirector = await db.query(seriesDirectorQuery, [mediaid]);
-
-        seriesData.cast = seriesActor.rows;
-        seriesData.studio = seriesStudio.rows;
-        seriesData.director = seriesDirector.rows;
-        seriesData.genre = seriesGenre.rows;
-
-        console.log(seriesData);
+        console.log("Seasons: ", seasonsResult.rows);
 
         return seriesData;
     }
 
 
+    
+
+    static async getEpisodesByID(seasonid) {
+        const episodesQuery = `SELECT E.* FROM EPISODES E JOIN SEASON S ON (S.seasonid = E.seasonid) WHERE S.seasonid = $1`;
+
+
+        const episodesResult = await db.query(episodesQuery, [seasonid]);
+        const episodesData = episodesResult.rows;
+
+        return episodesData;
+    }
 
 }
 
