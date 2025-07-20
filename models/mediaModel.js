@@ -115,8 +115,6 @@ class MediaModel {
         return seriesData;
     }
 
-
-
 }
 
 module.exports = MediaModel;
