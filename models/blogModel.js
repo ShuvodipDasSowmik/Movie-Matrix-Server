@@ -53,7 +53,7 @@ class blogModel {
             }
         ));
 
-        console.log(userBlogResult.rows);
+        // console.log(userBlogResult.rows);
 
         return userBlogResult.rows;
     }
