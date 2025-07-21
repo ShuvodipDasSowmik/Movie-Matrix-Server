@@ -364,6 +364,57 @@ class AdminModel {
         }
     }
 
+
+    static async getUserLocationInfo(){
+        const countryQuery = `
+            SELECT
+                country,
+                COUNT(*) AS userCount
+            FROM
+                user_activity
+            GROUP BY
+                country;
+        `
+        const cityQuery = `
+            SELECT
+                city,
+                COUNT(*) AS userCount
+            FROM
+                user_activity
+            GROUP BY
+                city;
+        `;
+
+        const regionQuery = `
+            SELECT
+                region,
+                COUNT(*) AS userCount
+            FROM
+                user_activity
+            GROUP BY
+                region;
+        `;
+
+        try {
+            const countryResult = await db.query(countryQuery);
+            const cityResult = await db.query(cityQuery);
+
+            const regionResult = await db.query(regionQuery);
+            return {
+                countries: countryResult.rows,
+                cities: cityResult.rows,
+                regions: regionResult.rows
+            };
+        }
+        
+        catch (error) {
+            console.error("Error fetching user location info:", error);
+            throw error;
+        }
+
+
+    }
+
 }
 
 module.exports = AdminModel;

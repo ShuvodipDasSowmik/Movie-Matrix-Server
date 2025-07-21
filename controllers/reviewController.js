@@ -103,6 +103,105 @@ class ReviewController {
         }
     }
 
+    static async getEpisodeReviewByID(req, res) {
+        const seasonId = req.params.seasonid;
+
+        try {
+            const reviews = await ReviewModel.getEpisodeReviewBySeasonID(seasonId);
+
+            res.status(200).json({
+                message: 'Success',
+                reviews
+            });
+        }
+        
+        catch (error) {
+            console.error('Error fetching episode reviews:', error);
+            
+            res.status(500).json({
+                error: 'Internal server error'
+            });
+        }
+    }
+
+    static async createEpisodeReview(req, res) {
+        const reviewData = req.body;
+
+        try {
+            const success = await ReviewModel.createEpisodeReview(reviewData);
+
+            if (success) {
+                res.status(200).json({
+                    message: 'Episode review created successfully'
+                });
+            }
+            else {
+                res.status(400).json({
+                    message: 'Failed to create episode review'
+                });
+            }
+        }
+        
+        catch (error) {
+            console.error('Error creating episode review:', error);
+            res.status(500).json({ error: 'Internal server error' });
+        }
+    }
+
+    static async updateEpisodeReview(req, res) {
+        const reviewData = req.body;
+
+        try {
+            const success = await ReviewModel.updateEpisodeReview(reviewData);
+
+            if (success) {
+                res.status(200).json({
+                    message: 'Episode review updated successfully'
+                });
+            }
+            else {
+                res.status(400).json({
+                    message: 'Failed to update episode review'
+                });
+            }
+        }
+        
+        catch (error) {
+            console.error('Error updating episode review:', error);
+            res.status(500).json({ error: 'Internal server error' });
+        }
+    }
+
+    static async deleteEpisodeReview(req, res) {
+        const reviewData = req.body;
+
+        console.log('reviewData:', reviewData);
+        
+
+        try {
+            const success = await ReviewModel.deleteEpisodeReview(reviewData);
+
+            if (success) {
+                res.status(200).json({
+                    message: 'Episode review deleted successfully'
+                });
+            }
+            else {
+                res.status(400).json({
+                    message: 'Failed to delete episode review'
+                });
+            }
+        }
+        
+        catch (error) {
+            console.error('Error deleting episode review:', error);
+
+            res.status(500).json({
+                error: 'Internal server error'
+            });
+        }
+    }
+
 }
 
 module.exports = ReviewController;
