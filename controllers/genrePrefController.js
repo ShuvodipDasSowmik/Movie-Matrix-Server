@@ -77,6 +77,27 @@ class genrePrefController {
             });
         }
     }
+
+    static async getMediaByUserPreferences(req, res) {
+        try {
+            const username = req.params.username;
+    
+            const mediaData = await genrePrefModel.getMediaByUserPreferences(username);
+    
+            return res.status(200).json({
+                message: 'Success',
+                mediaData
+            });
+        }
+        catch (error) {
+            console.error(error.message);
+            return res.status(500).json({
+                message: error.message
+            });
+        }
+    }
+
+
 }
 
 module.exports = genrePrefController;

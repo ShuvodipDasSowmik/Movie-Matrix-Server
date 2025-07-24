@@ -34,6 +34,20 @@ class genrePrefModel {
         const genresResult = await db.query(getGenresQuery);
         return genresResult.rows;
     }
+
+    static async getMediaByUserPreferences(username) {
+        const getMediaQuery = `
+            SELECT DISTINCT M.mediaid, M.language, M.title, M.releaseyear, M.poster, M.overallrating, M.pgrating, M.mediatype
+            FROM MEDIA M 
+            JOIN MEDIAGENRE MG ON (MG.mediaid = M.mediaid)
+            JOIN GENREPREFERENCE GF ON (GF.genreid = MG.genreid) 
+            WHERE GF.username = $1
+            ORDER BY M.overallrating DESC
+        `;
+        const mediaResult = await db.query(getMediaQuery, [username]);
+        return mediaResult.rows;
+    }
+
 }
 
 module.exports = genrePrefModel;
