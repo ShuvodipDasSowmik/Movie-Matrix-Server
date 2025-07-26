@@ -8,7 +8,7 @@ const upload = multer({ storage: multer.memoryStorage() });
 router.post('/create-blog', verifyToken, upload.single('image'), BlogController.CreatePost);
 router.get('/posts/:username', verifyToken, BlogController.GetPostByUsername);
 router.get('/posts', BlogController.getAllPosts);
-router.delete('/delete/:blogid', verifyToken, BlogController.DeleteBlog);
+router.delete('/delete-post/:blogid', verifyToken, BlogController.DeleteBlog);
 router.put('/update/:blogid', verifyToken, BlogController.UpdateBlog);
 router.post('/add-comment', verifyToken, BlogController.AddComment);
 router.delete('/delete-comment/:commentid', verifyToken, BlogController.DeleteComment);

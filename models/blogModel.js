@@ -59,7 +59,7 @@ class blogModel {
     }
 
     static async getAllBlogs() {
-        const blogsQuery = `SELECT blogid, username, content, image, updatedate FROM BLOG`;
+        const blogsQuery = `SELECT blogid, username, content, image, updatedate FROM BLOG ORDER BY updatedate DESC`;
         const blogsQResult = await db.query(blogsQuery);
         const blogsResult = blogsQResult.rows;
 

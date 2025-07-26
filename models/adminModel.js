@@ -366,53 +366,67 @@ class AdminModel {
 
 
     static async getUserLocationInfo(){
+        // Replace 'user_activity' with your actual table name if different
+        const uniqueVisitorsQuery = `
+            SELECT COUNT(DISTINCT ip_address) AS uniqueVisitors
+            FROM user_activity
+        `;
         const countryQuery = `
             SELECT
                 country,
-                COUNT(*) AS userCount
+                COUNT(DISTINCT ip_address) AS userCount
             FROM
                 user_activity
             GROUP BY
-                country;
-        `
+                country
+        `;
         const cityQuery = `
             SELECT
                 city,
-                COUNT(*) AS userCount
+                COUNT(DISTINCT ip_address) AS userCount
             FROM
                 user_activity
             GROUP BY
-                city;
+                city
         `;
-
         const regionQuery = `
             SELECT
-                region,
-                COUNT(*) AS userCount
+                regionname,
+                COUNT(DISTINCT ip_address) AS userCount
             FROM
                 user_activity
             GROUP BY
-                region;
+                regionname
+        `;
+        const osQuery = `
+            SELECT
+                os,
+                COUNT(DISTINCT ip_address) AS userCount
+            FROM
+                user_activity
+            GROUP BY
+                os
         `;
 
         try {
+            const uniqueVisitorsResult = await db.query(uniqueVisitorsQuery);
             const countryResult = await db.query(countryQuery);
             const cityResult = await db.query(cityQuery);
-
             const regionResult = await db.query(regionQuery);
+            const osResult = await db.query(osQuery);
+
             return {
+                uniqueVisitors: uniqueVisitorsResult.rows[0]?.uniquevisitors || 0,
                 countries: countryResult.rows,
                 cities: cityResult.rows,
-                regions: regionResult.rows
+                regions: regionResult.rows,
+                os: osResult.rows
             };
         }
-        
         catch (error) {
             console.error("Error fetching user location info:", error);
             throw error;
         }
-
-
     }
 
 }

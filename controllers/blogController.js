@@ -113,8 +113,8 @@ class BlogController {
 
     static async DeleteBlog(req, res){
         try {
-            const blogid = req.body.blogid;
-            await BlogController.DeleteBlog(blogid);
+            const blogid = req.params.blogid;
+            await BlogModel.deleteBlog(blogid);
 
             return res.status(200).json({
                 message: 'Success'
@@ -172,12 +172,15 @@ class BlogController {
         try {
             const commentid = req.params.commentid;
 
+            console.log('Deleting comment with ID:', commentid);
+
             await BlogModel.deleteComment(commentid);
 
             return res.status(200).json({
                 message: 'Success'
             });
         }
+
         catch (error) {
             console.error(error.message);
             

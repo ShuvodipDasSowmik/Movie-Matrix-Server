@@ -74,3 +74,21 @@ exports.sendEmail = async (req, res) => {
         return res.status(500).json({ error: 'Internal server error' });
     }
 }
+
+
+exports.getUserLocationInfo = async (req, res) => {
+    try {
+        const userLocationInfo = await AdminModel.getUserLocationInfo();
+        // console.log('User Location Info:', userLocationInfo);
+
+        return res.status(200).json({
+            message: 'Success',
+            userLocationInfo
+        });
+    } 
+    
+    catch (error) {
+        console.error('Error fetching user location info:', error);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+};

@@ -48,11 +48,19 @@ class WatchlistController {
         try {
             const mediaData = req.body;
 
-            WatchlistModel.addMediaToWatchlist(mediaData);
+            const result = await WatchlistModel.addMediaToWatchlist(mediaData);
+
+            if (!result.success) {
+                return res.status(400).json({
+                    success: false,
+                    message: result.message,
+                    error: result.error
+                });
+            }
 
             res.status(200).json({
                 success: true,
-                message: 'Media added to watchlist successfully'
+                message: result.message
             });
         }
 
@@ -61,7 +69,7 @@ class WatchlistController {
 
             res.status(500).json({
                 success: false,
-                message: 'Internal Server Error'
+                message: error.message
             });
         }
     }

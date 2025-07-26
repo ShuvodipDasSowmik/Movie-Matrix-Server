@@ -31,20 +31,28 @@ class WatchlistModel{
     }
 
     static async addMediaToWatchlist(mediaData){
-        const watchlistid = mediaData.watchlistid;
-        const medias = mediaData.medias;
+        try {
+            const watchlistid = mediaData.watchlistid;
+            const medias = mediaData.medias;
 
-        await Promise.all(
-            medias.map(async (mediaid) => {
-                const addMediaQuery = `INSERT INTO WATCHLISTMEDIA(watchlistid, mediaid) VALUES ($1, $2)`;
-                await db.query(addMediaQuery, [watchlistid, mediaid]);
-            })
-        );
+            await Promise.all(
+                medias.map(async (mediaid) => {
+                    const addMediaQuery = `INSERT INTO WATCHLISTMEDIA(watchlistid, mediaid) VALUES ($1, $2)`;
+                    await db.query(addMediaQuery, [watchlistid, mediaid]);
+                })
+            );
+            
+            return {
+                success: true,
+                message: `${medias.length} media items added to watchlist ${watchlistid}`
+            };
+        }
         
-        return {
-            success: true,
-            message: `${medias.length} media items added to watchlist ${watchlistid}`
-        };
+        catch (error) {
+            console.log(`Error adding media to watchlist: ${error.message}`);
+
+            throw new Error(`Media Already Exists In Watchlist`);
+        }
     }
 
     static async removeMediaFromWatchlist(watchlistid, mediaid) {
