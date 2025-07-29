@@ -186,3 +186,5 @@ class blogModel {
 }
 
 module.exports = blogModel;
+
+// Num of Queries = 15 [Simple = 13] [Advance = 2]

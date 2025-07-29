@@ -66,7 +66,7 @@ class MediaModel {
         const seriesDirectorQuery = `SELECT MD.directorid, directorname, picture FROM DIRECTOR D JOIN MEDIADIRECTOR MD ON (MD.directorid = D.directorid) WHERE MD.mediaid = $1`;
         const seasonsQuery = `SELECT * FROM SEASON WHERE mediaid = $1 ORDER BY seasonid ASC`;
         const seriesAwardQuery = `SELECT ma.mediaid, a.awardname, a.awardcategory, ma.year FROM mediaaward ma JOIN award a ON ma.awardid = a.awardid WHERE ma.mediaid = $1`;
-        
+
         const seriesResult = await db.query(seriesQuery, [mediaid]);
         const seriesData = seriesResult.rows[0];
 
@@ -92,7 +92,7 @@ class MediaModel {
     }
 
 
-    
+
 
     static async getEpisodesByID(seasonid) {
         const episodesQuery = `SELECT E.* FROM EPISODES E JOIN SEASON S ON (S.seasonid = E.seasonid) WHERE S.seasonid = $1`;
@@ -104,6 +104,83 @@ class MediaModel {
         return episodesData;
     }
 
+    static async getAllMediaByGenre() {
+        const query = `
+            SELECT 
+                g.genreid,
+                g.genrename,
+                m.mediaid,
+                m.title,
+                m.releaseyear,
+                m.language,
+                m.poster,
+                m.overallrating,
+                m.pgrating,
+                m.mediatype
+            FROM 
+                genre g
+            JOIN 
+                mediagenre mg ON g.genreid = mg.genreid
+            JOIN 
+                media m ON mg.mediaid = m.mediaid
+            ORDER BY 
+                g.genrename, m.title;
+        `;
+
+        const result = await db.query(query);
+        const rows = result.rows;
+
+        // Group by genrename
+        const genreMap = {};
+
+        rows.forEach(row => {
+            if (!genreMap[row.genrename]) {
+                genreMap[row.genrename] = [];
+            }
+
+            genreMap[row.genrename].push({
+                genreid: row.genreid,
+                mediaid: row.mediaid,
+                title: row.title,
+                poster: row.poster,
+                releaseyear: row.releaseyear,
+                language: row.language,
+                overallrating: row.overallrating,
+                pgrating: row.pgrating,
+                mediatype: row.mediatype
+            });
+        });
+
+        const genres = Object.keys(genreMap).map(genrename => ({
+            genrename,
+            media: genreMap[genrename]
+        }));
+
+        return genres;
+    }
+
+    static async getMediaByGenre(genreid){
+        const genreQuery = `
+            SELECT
+                m.*,
+                g.genrename
+            FROM
+                genre g
+            JOIN 
+                mediagenre mg ON g.genreid = mg.genreid
+            JOIN
+                media m ON mg.mediaid = m.mediaid
+            WHERE
+                g.genreid = $1;
+        `;
+
+        const mediaData = await db.query(genreQuery, [genreid]);
+
+        return mediaData.rows;
+    }
+
 }
 
 module.exports = MediaModel;
+
+// Num of Queries = 18 [Simple = 2] [Advance = 16]

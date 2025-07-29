@@ -24,7 +24,9 @@ class AdminModel {
                 });
             }
             return res.status(200).json({ message: 'Success', results });
-        } catch (promiseError) {
+        }
+        
+        catch (promiseError) {
             return res.status(500).json({
                 message: 'Failed to process Genre Insertions',
                 error: promiseError.message
@@ -139,21 +141,30 @@ class AdminModel {
                             value.trailerlink,
                             value.mediatype
                         ]);
+
                         const mediaid = result.rows[0].mediaid;
+                        
                         if (value.mediatype.toLowerCase() === 'movie') {
                             const mediaTypeQuery = `INSERT INTO MOVIE (mediaid, duration) VALUES ($1, $2)`;
                             await db.query(mediaTypeQuery, [mediaid, value.duration]);
-                        } else if (value.mediatype.toLowerCase() === 'series') {
+                        }
+                        
+                        else if (value.mediatype.toLowerCase() === 'series') {
                             const mediaTypeQuery = `INSERT INTO TVSERIES (mediaid, isongoing) VALUES ($1, $2)`;
                             await db.query(mediaTypeQuery, [mediaid, value.isongoing]);
                         }
+
                         return { success: true, result: value.title };
-                    } catch (err) {
+                    }
+                    
+                    catch (err) {
                         return { success: false, result: err.message };
                     }
                 })
             );
+
             const failures = results.filter(result => !result.success);
+
             if (failures.length > 0) {
                 return res.status(207).json({
                     message: 'Some Media could not be inserted',
@@ -165,7 +176,9 @@ class AdminModel {
                 message: 'All media inserted successfully',
                 results
             });
-        } catch (promiseError) {
+        }
+        
+        catch (promiseError) {
             return res.status(500).json({
                 message: 'Failed to process Media Data Insertion',
                 error: promiseError.message
@@ -175,6 +188,7 @@ class AdminModel {
 
     static async insertMediaActors(mediaActorData, res) {
         const mediaActorQuery = `INSERT INTO MEDIAACTOR (mediaid, actorid) VALUES ((SELECT mediaid FROM MEDIA WHERE title = $1), (SELECT actorid FROM ACTOR WHERE actorname = $2))`;
+        
         try {
             const results = await Promise.all(
                 mediaActorData.map(async (value) => {
@@ -186,7 +200,9 @@ class AdminModel {
                     }
                 })
             );
+
             const failures = results.filter(result => !result.success);
+
             if (failures.length > 0) {
                 return res.status(207).json({
                     message: 'Some Movie Actor Mapping Data could not be inserted',
@@ -195,7 +211,9 @@ class AdminModel {
                 });
             }
             return res.status(200).json({ message: 'Success', results });
-        } catch (promiseError) {
+        }
+        
+        catch (promiseError) {
             return res.status(500).json({
                 message: 'Failed to process Media Actor Data Insertions',
                 error: promiseError.message
@@ -216,7 +234,9 @@ class AdminModel {
                     }
                 })
             );
+
             const failures = results.filter(result => !result.success);
+
             if (failures.length > 0) {
                 return res.status(207).json({
                     message: 'Some Media Director Mapping Data Insertion Not Successful',
@@ -224,8 +244,11 @@ class AdminModel {
                     failures
                 });
             }
+
             return res.status(200).json({ message: 'Success', results });
-        } catch (promiseError) {
+        }
+        
+        catch (promiseError) {
             return res.status(500).json({
                 message: 'Failed to process Media Director Data Insertion',
                 error: promiseError.message
@@ -235,6 +258,7 @@ class AdminModel {
 
     static async insertMediaStudios(mediaStudioData, res) {
         const mediaStudioQuery = `INSERT INTO MEDIASTUDIO (mediaid, studioid) VALUES ((SELECT mediaid FROM MEDIA WHERE title = $1), (SELECT studioid FROM STUDIO WHERE studioname = $2))`;
+        
         try {
             const results = await Promise.all(
                 mediaStudioData.map(async (value) => {
@@ -246,7 +270,9 @@ class AdminModel {
                     }
                 })
             );
+
             const failures = results.filter(result => !result.success);
+
             if (failures.length > 0) {
                 return res.status(207).json({
                     message: 'Some Media Studio Mapping Data Insertion Not Successful',
@@ -254,8 +280,11 @@ class AdminModel {
                     failures
                 });
             }
+
             return res.status(200).json({ message: 'Success', results });
-        } catch (promiseError) {
+        }
+        
+        catch (promiseError) {
             return res.status(500).json({
                 message: 'Failed to process Media Studio Mapping Data Insertion',
                 error: promiseError.message
@@ -265,6 +294,7 @@ class AdminModel {
 
     static async insertMediaGenres(mediaGenreData, res) {
         const mediaGenreQuery = `INSERT INTO MEDIAGENRE (mediaid, genreid) VALUES ((SELECT mediaid FROM MEDIA WHERE title = $1),(SELECT genreid FROM GENRE WHERE genrename = $2))`;
+        
         try {
             const results = await Promise.all(
                 mediaGenreData.map(async (value) => {
@@ -277,6 +307,7 @@ class AdminModel {
                 })
             );
             const failures = results.filter(result => !result.success);
+
             if (failures.length > 0) {
                 return res.status(207).json({
                     message: 'Some Media Genre Mapping Data Insertion Not Successful',
@@ -284,8 +315,11 @@ class AdminModel {
                     failures
                 });
             }
+
             return res.status(200).json({ message: 'Success', results });
-        } catch (promiseError) {
+        }
+        
+        catch (promiseError) {
             return res.status(500).json({
                 message: 'Failed to process Media Genre Mapping Data Insertion',
                 error: promiseError.message
@@ -432,3 +466,5 @@ class AdminModel {
 }
 
 module.exports = AdminModel;
+
+// Num of Queries = 17 [Simple = 12] [Advance = 5]

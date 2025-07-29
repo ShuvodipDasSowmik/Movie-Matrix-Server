@@ -135,3 +135,6 @@ class reviewModel {
 
 
 module.exports = reviewModel;
+
+
+// Num of Queries = 8 [Simple = 8]

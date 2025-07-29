@@ -39,3 +39,5 @@ class ActorModel {
 }
 
 module.exports = ActorModel;
+
+// Num of Queries = 3 [Simple = 1] [Advance = 2]

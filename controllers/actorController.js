@@ -45,3 +45,4 @@ class ActorController {
 }
 
 module.exports = ActorController;
+

@@ -26,3 +26,6 @@ pool.query('SELECT 1')
   });
 
 module.exports = pool; 
+
+
+// Num of Queries = 1

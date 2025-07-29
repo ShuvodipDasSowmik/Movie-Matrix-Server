@@ -349,3 +349,5 @@ class UserController {
 }
 
 module.exports = UserController;
+
+// Num of Queries = 1 [Simple]

@@ -89,3 +89,6 @@ class SearchController {
 }
 
 module.exports = SearchController;
+
+
+// Num of Queries = 4 [Simple]

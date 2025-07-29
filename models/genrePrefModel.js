@@ -51,3 +51,5 @@ class genrePrefModel {
 }
 
 module.exports = genrePrefModel;
+
+// Num of Queries = 6 [Simple = 4] [Advance = 2]

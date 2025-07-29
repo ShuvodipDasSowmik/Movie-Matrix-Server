@@ -133,3 +133,6 @@ class WatchlistModel{
 }
 
 module.exports = WatchlistModel;
+
+
+// Num of Queries = 8 [Simple = 7] [Advance = 1]

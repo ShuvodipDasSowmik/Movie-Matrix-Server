@@ -221,3 +221,5 @@ class User {
 }
 
 module.exports = User;
+
+// Num of Queries = 15 [Simple = 15]

@@ -94,6 +94,40 @@ class MediaController{
         }
     }
 
+    static async getAllMediaByGenre(req, res){
+        try{
+            const mediaData = await MediaModel.getAllMediaByGenre();
+
+            return res.status(200).json({
+                message: 'Success',
+                mediaData
+            });
+        }
+
+        catch (error) {
+            return res.status(404).json({
+                message: error.message
+            })
+        }
+    }
+
+    static async getMediaByGenre(req, res){
+        try{
+            const mediaData = await MediaModel.getMediaByGenre(req.params.genreid);
+
+            return res.status(200).json({
+                message: 'Success',
+                mediaData
+            });
+        }
+        
+        catch (error) {
+            return res.status(404).json({
+                message: error.message
+            })
+        }
+    }
+
 }
 
 module.exports = MediaController;

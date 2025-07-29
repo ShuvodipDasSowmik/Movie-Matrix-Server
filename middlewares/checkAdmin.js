@@ -22,7 +22,7 @@ const checkAdmin = async (req, res, next) => {
         }
 
         // User is an admin, proceed to the next middleware or route handler
-        console.log('Admin check passed for user:', username);
+        // console.log('Admin check passed for user:', username);
 
         next();
     }
